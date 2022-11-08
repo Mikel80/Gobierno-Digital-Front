@@ -1,11 +1,12 @@
 import React from "react";
 import { useState } from "react";
+import { Navigate } from "react-router-dom";
 import useRequest from "../hooks/useRequest";
 
 export default function Login() {
   const [userCreds, setUserCreds] = useState({
     email: "",
-    pass: "",
+    password: "",
   });
 
   const [requestState, sendRequest] = useRequest();
@@ -29,7 +30,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex flex-3 justify-center align-middle">
+    <div className="flex flex-1 justify-center items-center">
       <form className="flex flex-col">
         <input
           type="email"
@@ -39,7 +40,7 @@ export default function Login() {
         />
         <input
           type="password"
-          name="pass"
+          name="password"
           onChange={handleUserCredsChange}
           className="border"
         />
@@ -49,6 +50,7 @@ export default function Login() {
 
         {requestState.loading && <div>Loading...</div>}
         {requestState.error && <div>Algo Fallo</div>}
+        {requestState.data && requestState.data.token && <Navigate to="home" replace />}
       </form>
     </div>
   );
