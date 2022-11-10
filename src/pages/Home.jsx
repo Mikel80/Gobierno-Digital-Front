@@ -1,10 +1,15 @@
 import React from 'react'
+import { useContext } from 'react'
+import { UserContext } from '../context/user'
+import Admin from '../components/Admin';
+import User from '../components/User';
 
 export default function Home() {
-  // Depending on Role display Admin or User
-  return (
-    <div className="flex-1">
-      Home component
-    </div>
-  )
+  const [userState] = useContext(UserContext);
+  const role = userState.user.roles[0];
+
+  if(role.name === 'admin') {
+    return <Admin />
+  }
+  return <User />
 }

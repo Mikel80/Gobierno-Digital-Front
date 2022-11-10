@@ -1,14 +1,8 @@
+import { useContext } from "react";
 import { useState } from "react";
-import useAuth, { userActions } from "./useAuth";
+import { UserContext } from "../context/user";
 
 const API_URL = "http://localhost:8000/api/";
-
-const resources = [
-  { resource: "login", method: "POST" },
-  { resource: "logout", method: "POST" },
-  { resource: "user", method: "POST" },
-  { resource: "user", method: "GET" },
-];
 
 const useRequest = () => {
   const [requestState, setRequestState] = useState({
@@ -16,23 +10,29 @@ const useRequest = () => {
     error: null,
     data: undefined,
   });
-  const [userState, dispatch] = useAuth();
 
-  const sendRequest = async ({ resource, payload }) => {
-    const endPoint = resources.find((item) => item.resource === resource);
+  const [userState, dispatch] = useContext(UserContext);
 
+  const setUser = (data) => {
+    console.log(data)
+    dispatch({ type: "login_success", payload: data });
+  };
+
+  const sendRequest = async (resource, payload ) => {
+    const { endPoint, method } = resource;
     const options = {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
+      method
     };
-    endPoint.method && (options["method"] = endPoint.method);
+    
+    if(userState.token) {
+      options.headers['Authorization'] = `Bearer ${userState.token}`
+    }
+    
     payload && (options["body"] = JSON.stringify(payload));
-
-    const setUser = (data) => {
-      dispatch({ type: userActions.LOGIN_SUCCESS, payload: data });
-    };
 
     try {
       setRequestState((prevState) => {
@@ -41,20 +41,21 @@ const useRequest = () => {
           loading: true,
         };
       });
-      const res = await fetch(`${API_URL}${endPoint.resource}`, options);
+      const res = await fetch(`${API_URL}${endPoint}`, options);
       const result = await res.json();
 
       setRequestState((prevState) => {
         return {
           loading: false,
-          data: {...result},
+          data: { ...result },
           error: null,
         };
       });
 
-      if (endPoint.resource === "login") {
+      if (endPoint === "login") {
         setUser(result);
       }
+      return result;
     } catch (err) {
       console.log(err);
       setRequestState((prevState) => {

@@ -1,14 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
+import { UserContext } from "../context/user";
 
 export default function RequireAuth({ children }) {
-  const [userState, dispatch] = useAuth();
+  const [userState] = useContext(UserContext);
   let location = useLocation();
 
-  console.log(userState);
-
-  if (!userState.user || !userState.token) {
+  if (!userState.user.name || !userState.token) {
     return <Navigate to="/" state={{ from: location }} replace />;
   } else {
     return children;

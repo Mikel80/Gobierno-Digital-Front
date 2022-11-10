@@ -3,18 +3,28 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Layout from "./components/Layout";
-
+import RequireAuth from "./components/RequireAuth";
+import { UserProvider } from "./context/user";
 
 function App() {
   return (
-    <Layout>
+    <UserProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="home" element={<Home />} />
-        </Routes>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route
+              path="home"
+              element={
+                <RequireAuth>
+                  <Home />
+                </RequireAuth>
+              }
+            />
+          </Routes>
+        </Layout>
       </BrowserRouter>
-    </Layout>
+    </UserProvider>
   );
 }
 
